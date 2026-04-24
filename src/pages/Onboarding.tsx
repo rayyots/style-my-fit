@@ -82,6 +82,7 @@ const Onboarding = () => {
       }).eq("id", user.id);
       if (pErr) throw pErr;
       await upsertAvatar(user.id, cfg);
+      await saveAvatarGlbUrl(user.id, glbUrl);
       toast.success("Your avatar is ready.");
       navigate("/showroom");
     } catch (e: any) {
