@@ -92,9 +92,10 @@ const Floor = () => (
 interface Props {
   avatar: AvatarConfig;
   gender?: string;
+  glbUrl?: string | null;
 }
 
-export const Showroom3D = ({ avatar, gender }: Props) => {
+export const Showroom3D = ({ avatar, gender, glbUrl }: Props) => {
   const [brands, setBrands] = useState<BrandRow[]>([]);
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export const Showroom3D = ({ avatar, gender }: Props) => {
         <Floor />
         {/* User avatar at center */}
         <group position={[0, 0, 0]}>
-          <Avatar3D cfg={avatar} gender={gender} />
+          <Avatar3D cfg={avatar} gender={gender} glbUrl={glbUrl} />
         </group>
         {brands.map((b, i) => (
           <BrandPlinth
