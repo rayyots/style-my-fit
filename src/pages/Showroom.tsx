@@ -38,7 +38,7 @@ const Showroom = () => {
         <span className="font-display text-xl tracking-[0.4em]">ATELIER</span>
         <div className="hidden md:flex items-center gap-8 font-mono-ed text-xs tracking-[0.3em]">
           <span className="text-muted-foreground">SHOWROOM</span>
-          <button onClick={() => navigate("/onboarding")} className="hover:text-accent-foreground hover:bg-accent px-2 py-1 transition-colors">EDIT AVATAR</button>
+          <button onClick={() => navigate("/onboarding?edit=1")} className="hover:text-accent-foreground hover:bg-accent px-2 py-1 transition-colors">EDIT AVATAR</button>
           <Link to="/cart" className="hover:text-accent-foreground hover:bg-accent px-2 py-1 transition-colors">CART</Link>
           {isAdmin && <Link to="/admin" className="hover:text-accent-foreground hover:bg-accent px-2 py-1 transition-colors">ADMIN</Link>}
         </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ type Step = 0 | 1 | 2;
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editMode = searchParams.get("edit") === "1";
   const { user, loading } = useAuth();
   const [step, setStep] = useState<Step>(0);
   const [name, setName] = useState("");
@@ -38,11 +40,16 @@ const Onboarding = () => {
       const av = await fetchAvatar(user.id);
       if (av) {
         setCfg(av);
-        // If they've already onboarded, jump straight to showroom
-        navigate("/showroom");
+        // Already onboarded — only auto-redirect when NOT explicitly editing
+        if (!editMode) {
+          navigate("/showroom");
+        } else {
+          // Jump straight into the refine step for quick edits
+          setStep(2);
+        }
       }
     })();
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, editMode]);
 
   const proceedFromMeasurements = () => {
     setCfg(deriveFromMeasurements(height, weight, gender));
