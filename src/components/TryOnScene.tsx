@@ -1,6 +1,6 @@
 import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, MutableRefObject } from "react";
 import { TextureLoader, DoubleSide, RepeatWrapping } from "three";
 import { Avatar3D } from "./Avatar3D";
 import { AvatarConfig } from "@/lib/avatar";
@@ -204,9 +204,11 @@ interface Props {
   glbUrl?: string | null;
   /** Auto-decide between mouse and touch interaction. Defaults true. */
   enableTouchControls?: boolean;
+  /** Ref for imperative camera control from floating buttons. */
+  controlsRef?: MutableRefObject<any>;
 }
 
-export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender, glbUrl }: Props) => {
+export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender, glbUrl, controlsRef }: Props) => {
   return (
     <Canvas shadows camera={{ position: [0, 1.4, 4], fov: 42 }} dpr={[1, 1.75]}>
       <color attach="background" args={["#0e0c0a"]} />
@@ -223,6 +225,7 @@ export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender, glbUrl }: P
         <Environment preset="studio" />
       </Suspense>
       <OrbitControls
+        ref={controlsRef as any}
         enablePan={false}
         minDistance={1.8}
         maxDistance={6}
