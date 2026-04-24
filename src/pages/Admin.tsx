@@ -34,8 +34,6 @@ const Admin = () => {
   const [pSizes, setPSizes] = useState<string[]>(["S", "M", "L"]);
   const [pPrice, setPPrice] = useState("0");
   const [pCurrency, setPCurrency] = useState("USD");
-  const [pType, setPType] = useState<"internal"|"external">("internal");
-  const [pExternal, setPExternal] = useState("");
   const [pFiles, setPFiles] = useState<FileList | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -71,7 +69,6 @@ const Admin = () => {
 
   const createProduct = async () => {
     if (!pBrand || !pName || !pCategory) { toast.error("Fill brand / name / category"); return; }
-    if (pType === "external" && !pExternal) { toast.error("External URL required"); return; }
     setBusy(true);
     try {
       const imageUrls: string[] = [];
@@ -88,11 +85,11 @@ const Admin = () => {
         brand_id: pBrand, name: pName, category: pCategory,
         description: pDescription || null, gender: pGender, sizes: pSizes,
         images: imageUrls, price_cents: Math.round(parseFloat(pPrice || "0") * 100),
-        currency: pCurrency, purchase_type: pType, external_url: pType === "external" ? pExternal : null,
+        currency: pCurrency,
       });
       if (error) throw error;
       toast.success("Product added");
-      setPName(""); setPCategory(""); setPDescription(""); setPExternal(""); setPFiles(null);
+      setPName(""); setPCategory(""); setPDescription(""); setPFiles(null);
       reload();
     } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
   };
@@ -190,15 +187,6 @@ const Admin = () => {
                 <Field label="Currency" v={pCurrency} set={setPCurrency} />
               </div>
               <div>
-                <Label className="text-[10px] uppercase tracking-widest mb-2 block">Purchase type</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["internal","external"] as const).map((t) => (
-                    <button key={t} onClick={() => setPType(t)} className={`h-10 border text-[11px] uppercase tracking-widest ${pType===t?"bg-foreground text-background border-foreground":"border-foreground/20"}`}>{t}</button>
-                  ))}
-                </div>
-              </div>
-              {pType === "external" && <Field label="External URL" v={pExternal} set={setPExternal} placeholder="https://brand.com/item" />}
-              <div>
                 <Label className="text-[10px] uppercase tracking-widest">Images</Label>
                 <input type="file" multiple accept="image/*" onChange={(e) => setPFiles(e.target.files)} className="mt-2 block w-full text-xs" />
               </div>
@@ -213,7 +201,7 @@ const Admin = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-base truncate">{p.name}</p>
-                    <p className="font-mono-ed text-[10px] text-muted-foreground">{p.brand?.name} · {p.category} · {p.purchase_type}</p>
+                    <p className="font-mono-ed text-[10px] text-muted-foreground">{p.brand?.name} · {p.category}</p>
                   </div>
                   <button onClick={() => deleteProduct(p.id)} className="font-mono-ed text-[10px] text-destructive hover:underline">DELETE</button>
                 </div>
