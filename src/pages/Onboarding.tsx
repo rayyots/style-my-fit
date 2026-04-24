@@ -202,6 +202,31 @@ const Onboarding = () => {
                     <input type="color" value={cfg.hair_color} onChange={(e) => setCfg({ ...cfg, hair_color: e.target.value })} className="h-10 w-full border border-foreground/20 cursor-pointer bg-transparent" />
                   </div>
                 </div>
+
+                <div className="border-t border-gold/30 pt-5">
+                  <p className="font-mono-ed text-[10px] tracking-[0.3em] text-gold mb-2">PHOTOREAL · OPTIONAL</p>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Build a Ready Player Me avatar — a polished 3D body that replaces the parametric one in fittings.
+                  </p>
+                  {glbUrl ? (
+                    <div className="flex items-center justify-between gap-3 border border-gold/30 px-3 py-2">
+                      <span className="font-mono-ed text-[10px] tracking-[0.3em] text-gold truncate">RPM AVATAR LINKED</span>
+                      <div className="flex gap-2">
+                        <button onClick={() => setShowRPM(true)} className="font-mono-ed text-[10px] tracking-[0.3em] hover:text-gold">CHANGE</button>
+                        <button onClick={() => setGlbUrl(null)} className="font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground hover:text-destructive">REMOVE</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowRPM(true)}
+                      className="rounded-none w-full h-12 font-mono-ed text-xs tracking-[0.3em] gap-2"
+                    >
+                      <Sparkles size={14} className="text-gold" /> BUILD PHOTOREAL AVATAR
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(1)} className="rounded-none h-12 font-mono-ed text-xs tracking-[0.3em]">← BACK</Button>
@@ -215,13 +240,39 @@ const Onboarding = () => {
 
         {/* Right: 3D preview */}
         <section className="bg-secondary/40 border-t lg:border-t-0 lg:border-l border-foreground/10 relative min-h-[55vh] lg:min-h-0">
-          <AvatarPreview cfg={cfg} bodyScale={bodyScaleFromHeight(height)} gender={gender} />
+          <AvatarPreview cfg={cfg} bodyScale={bodyScaleFromHeight(height)} gender={gender} glbUrl={glbUrl} />
           <div className="absolute top-4 left-4 font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground">
             <span className="hidden md:inline">LIVE PREVIEW · ROTATE WITH MOUSE</span>
             <span className="md:hidden">SWIPE TO ROTATE</span>
           </div>
         </section>
       </div>
+
+      {showRPM && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-6">
+          <div className="relative w-full h-full max-w-5xl max-h-[92vh] bg-background border border-gold/40 flex flex-col">
+            <div className="flex items-center justify-between border-b border-foreground/10 px-4 py-3">
+              <p className="font-mono-ed text-[10px] tracking-[0.3em] text-gold">READY PLAYER ME · BUILD YOUR AVATAR</p>
+              <button
+                onClick={() => setShowRPM(false)}
+                aria-label="Close"
+                className="grid place-items-center w-9 h-9 border border-foreground/20 hover:border-gold transition-colors"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0">
+              <RPMCreator
+                onAvatar={(url) => {
+                  setGlbUrl(url);
+                  setShowRPM(false);
+                  toast.success("Avatar linked.");
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
