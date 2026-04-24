@@ -40,3 +40,43 @@ export function deriveSizeTiers(input: BodyInput): { primary: SizeTier; recommen
 
   return { primary, recommended };
 }
+
+/**
+ * Score how well a chosen size fits a user's primary tier.
+ * 100 = perfect, falls off ~25 pts per tier of distance, clamped at 10.
+ */
+export function fitScore(chosen: string, primary: SizeTier | null): number {
+  if (!primary) return 75;
+  const idxA = ALL_SIZES.indexOf(chosen as SizeTier);
+  const idxB = ALL_SIZES.indexOf(primary);
+  if (idxA === -1) return 70;
+  const dist = Math.abs(idxA - idxB);
+  return Math.max(10, 100 - dist * 28);
+}
+
+export function fitVerdict(score: number): {
+  label: string;
+  tone: "good" | "ok" | "bad";
+} {
+  if (score >= 85) return { label: "Excellent fit", tone: "good" };
+  if (score >= 60) return { label: "Acceptable", tone: "ok" };
+  return { label: "Likely off", tone: "bad" };
+}
+
+/** Suggest the closest available size if the chosen one is not the primary tier. */
+export function suggestBetterSize(
+  available: string[],
+  primary: SizeTier | null
+): string | null {
+  if (!primary) return null;
+  const ranked = available
+    .filter((s) => ALL_SIZES.includes(s as SizeTier))
+    .map((s) => ({
+      s,
+      d: Math.abs(
+        ALL_SIZES.indexOf(s as SizeTier) - ALL_SIZES.indexOf(primary)
+      ),
+    }))
+    .sort((a, b) => a.d - b.d);
+  return ranked[0]?.s ?? null;
+}
