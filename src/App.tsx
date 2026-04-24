@@ -10,6 +10,11 @@ import Auth from "./pages/Auth.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import Showroom from "./pages/Showroom.tsx";
 import Brand from "./pages/Brand.tsx";
+import TryOn from "./pages/TryOn.tsx";
+import Cart from "./pages/Cart.tsx";
+import Checkout from "./pages/Checkout.tsx";
+import OrderConfirm from "./pages/OrderConfirm.tsx";
+import Admin from "./pages/Admin.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +31,11 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/showroom" element={<Showroom />} />
             <Route path="/brand/:id" element={<Brand />} />
+            <Route path="/tryon/:id" element={<TryOn />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders/:id" element={<OrderConfirm />} />
+            <Route path="/admin" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
