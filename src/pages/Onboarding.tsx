@@ -7,10 +7,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
-import { AvatarConfig, bodyScaleFromHeight, defaultAvatar, deriveFromMeasurements, fetchAvatar, upsertAvatar } from "@/lib/avatar";
+import {
+  AvatarConfig,
+  bodyScaleFromHeight,
+  defaultAvatar,
+  deriveFromMeasurements,
+  fetchAvatar,
+  fetchAvatarGlbUrl,
+  saveAvatarGlbUrl,
+  upsertAvatar,
+} from "@/lib/avatar";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { RPMCreator } from "@/components/RPMCreator";
+import { Sparkles, X } from "lucide-react";
 
 type Step = 0 | 1 | 2;
 
@@ -26,6 +37,8 @@ const Onboarding = () => {
   const [weight, setWeight] = useState(65);
   const [cfg, setCfg] = useState<AvatarConfig>(defaultAvatar);
   const [busy, setBusy] = useState(false);
+  const [glbUrl, setGlbUrl] = useState<string | null>(null);
+  const [showRPM, setShowRPM] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -40,6 +53,8 @@ const Onboarding = () => {
       if (data?.height_cm) setHeight(Number(data.height_cm));
       if (data?.weight_kg) setWeight(Number(data.weight_kg));
       const av = await fetchAvatar(user.id);
+      const glb = await fetchAvatarGlbUrl(user.id);
+      if (glb) setGlbUrl(glb);
       if (av) {
         setCfg(av);
         // Already onboarded — only auto-redirect when NOT explicitly editing
