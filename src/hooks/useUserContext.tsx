@@ -6,7 +6,13 @@ import { deriveSizeTiers, SizeTier } from "@/lib/sizing";
 
 export interface UserCtx {
   loading: boolean;
-  profile: { gender?: string; height_cm?: number; weight_kg?: number; name?: string } | null;
+  profile: {
+    gender?: string;
+    height_cm?: number;
+    weight_kg?: number;
+    name?: string;
+    avatar_glb_url?: string | null;
+  } | null;
   avatar: AvatarConfig | null;
   sizeTier: SizeTier | null;
   recommendedSizes: SizeTier[];
@@ -25,7 +31,7 @@ export function useUserContext(): UserCtx {
     if (!user) { setCtx((c) => ({ ...c, loading: false })); return; }
     (async () => {
       const [{ data: profile }, av, { data: roles }] = await Promise.all([
-        supabase.from("profiles").select("name,gender,height_cm,weight_kg").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("name,gender,height_cm,weight_kg,avatar_glb_url").eq("id", user.id).maybeSingle(),
         fetchAvatar(user.id),
         supabase.from("user_roles").select("role").eq("user_id", user.id),
       ]);
