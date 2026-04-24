@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,13 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
-import { AvatarConfig, defaultAvatar, deriveFromMeasurements, fetchAvatar, upsertAvatar } from "@/lib/avatar";
+import { AvatarConfig, bodyScaleFromHeight, defaultAvatar, deriveFromMeasurements, fetchAvatar, upsertAvatar } from "@/lib/avatar";
 import { AvatarPreview } from "@/components/AvatarPreview";
 
 type Step = 0 | 1 | 2;
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editMode = searchParams.get("edit") === "1";
   const { user, loading } = useAuth();
   const [step, setStep] = useState<Step>(0);
   const [name, setName] = useState("");
@@ -38,11 +40,16 @@ const Onboarding = () => {
       const av = await fetchAvatar(user.id);
       if (av) {
         setCfg(av);
-        // If they've already onboarded, jump straight to showroom
-        navigate("/showroom");
+        // Already onboarded — only auto-redirect when NOT explicitly editing
+        if (!editMode) {
+          navigate("/showroom");
+        } else {
+          // Jump straight into the refine step for quick edits
+          setStep(2);
+        }
       }
     })();
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, editMode]);
 
   const proceedFromMeasurements = () => {
     setCfg(deriveFromMeasurements(height, weight, gender));
@@ -189,7 +196,7 @@ const Onboarding = () => {
 
         {/* Right: 3D preview */}
         <section className="bg-secondary/40 border-l border-foreground/10 relative">
-          <AvatarPreview cfg={cfg} />
+          <AvatarPreview cfg={cfg} bodyScale={bodyScaleFromHeight(height)} />
           <div className="absolute top-4 left-4 font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground">
             LIVE PREVIEW · ROTATE WITH MOUSE
           </div>
