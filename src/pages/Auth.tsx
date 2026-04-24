@@ -46,7 +46,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast.success("Welcome to Atelier.");
+        toast.success("Welcome to KO.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -63,19 +63,19 @@ const Auth = () => {
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
       <aside className="hidden lg:flex flex-col justify-between p-12 bg-foreground text-background relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-spotlight opacity-60" />
-        <Link to="/" className="font-display text-2xl tracking-[0.4em] relative z-10">
-          ATELIER
+        <Link to="/" className="font-display text-2xl tracking-[0.35em] relative z-10">
+          <span className="italic">K</span>O
         </Link>
         <div className="relative z-10">
           <p className="font-display text-5xl leading-[1.05] mb-6 animate-fade-up">
             Walk the runway.<br />
-            <span className="italic text-accent">Try the look.</span>
+            <span className="italic text-gold">Try the look.</span>
           </p>
           <p className="text-sm text-background/70 max-w-sm">
             A 3D showroom built around your body. Your avatar. Your fit.
           </p>
         </div>
-        <p className="font-mono-ed text-xs text-background/40 relative z-10">© ATELIER MMXXV</p>
+        <p className="font-mono-ed text-xs text-background/40 relative z-10">© KO MMXXVI</p>
       </aside>
 
       <main className="flex items-center justify-center p-8">
