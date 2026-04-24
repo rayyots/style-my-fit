@@ -26,6 +26,14 @@ const Cart = () => {
   const total = internal.reduce((s, i) => s + i.product.price_cents * i.quantity, 0);
   const currency = internal[0]?.product.currency ?? "USD";
 
+  // Optimistic local mutators — total updates instantly
+  const setQtyLocal = (id: string, q: number) => {
+    setItems((prev) =>
+      q <= 0 ? prev.filter((i) => i.id !== id) : prev.map((i) => (i.id === id ? { ...i, quantity: q } : i))
+    );
+  };
+  const removeLocal = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-foreground/10 px-6 lg:px-12 py-4 flex items-center justify-between">
@@ -48,7 +56,7 @@ const Cart = () => {
                 <h2 className="font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground mb-6">IN-APP CHECKOUT</h2>
                 <div className="space-y-4">
                   {internal.map((i) => (
-                    <Row key={i.id} item={i} reload={reload} />
+                    <Row key={i.id} item={i} setQtyLocal={setQtyLocal} removeLocal={removeLocal} />
                   ))}
                 </div>
                 <div className="mt-8 flex justify-between items-end border-t border-foreground/10 pt-6">
@@ -66,7 +74,7 @@ const Cart = () => {
                 <h2 className="font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground mb-6">EXTERNAL · BRAND REDIRECT</h2>
                 <div className="space-y-4">
                   {external.map((i) => (
-                    <Row key={i.id} item={i} reload={reload} external />
+                    <Row key={i.id} item={i} setQtyLocal={setQtyLocal} removeLocal={removeLocal} external />
                   ))}
                 </div>
               </section>
@@ -78,7 +86,17 @@ const Cart = () => {
   );
 };
 
-const Row = ({ item, reload, external }: { item: CartRow; reload: () => Promise<void>; external?: boolean }) => (
+const Row = ({
+  item,
+  setQtyLocal,
+  removeLocal,
+  external,
+}: {
+  item: CartRow;
+  setQtyLocal: (id: string, q: number) => void;
+  removeLocal: (id: string) => void;
+  external?: boolean;
+}) => (
   <div className="flex gap-4 border border-foreground/10 p-3">
     <div className="w-24 h-32 bg-secondary shrink-0">
       {item.product.images[0] && <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />}
@@ -90,15 +108,34 @@ const Row = ({ item, reload, external }: { item: CartRow; reload: () => Promise<
       <div className="mt-auto flex items-center gap-3">
         {!external && (
           <div className="flex border border-foreground/20">
-            <button onClick={async () => { await updateCartQty(item.id, item.quantity - 1); reload(); }} className="w-8 h-8 hover:bg-accent">−</button>
+            <button
+              aria-label="Decrease quantity"
+              onClick={() => {
+                const next = item.quantity - 1;
+                setQtyLocal(item.id, next);
+                updateCartQty(item.id, next).catch(() => setQtyLocal(item.id, item.quantity));
+              }}
+              className="w-8 h-8 hover:bg-accent">−</button>
             <span className="w-8 h-8 flex items-center justify-center font-mono-ed text-xs">{item.quantity}</span>
-            <button onClick={async () => { await updateCartQty(item.id, item.quantity + 1); reload(); }} className="w-8 h-8 hover:bg-accent">+</button>
+            <button
+              aria-label="Increase quantity"
+              onClick={() => {
+                const next = item.quantity + 1;
+                setQtyLocal(item.id, next);
+                updateCartQty(item.id, next).catch(() => setQtyLocal(item.id, item.quantity));
+              }}
+              className="w-8 h-8 hover:bg-accent">+</button>
           </div>
         )}
         {external && item.product.external_url && (
           <a href={item.product.external_url} target="_blank" rel="noopener" className="font-mono-ed text-[10px] tracking-[0.3em] underline">OPEN BRAND SITE ↗</a>
         )}
-        <button onClick={async () => { await removeCart(item.id); reload(); }} className="font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground hover:text-destructive ml-auto">REMOVE</button>
+        <button
+          onClick={() => {
+            removeLocal(item.id);
+            removeCart(item.id).catch(() => {});
+          }}
+          className="font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground hover:text-destructive ml-auto">REMOVE</button>
       </div>
     </div>
   </div>
