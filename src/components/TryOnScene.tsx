@@ -201,11 +201,12 @@ interface Props {
   overlay: OverlayCfg | null;
   bodyScale?: number;
   gender?: string;
+  glbUrl?: string | null;
   /** Auto-decide between mouse and touch interaction. Defaults true. */
   enableTouchControls?: boolean;
 }
 
-export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender }: Props) => {
+export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender, glbUrl }: Props) => {
   return (
     <Canvas shadows camera={{ position: [0, 1.4, 4], fov: 42 }} dpr={[1, 1.75]}>
       <color attach="background" args={["#0e0c0a"]} />
@@ -213,7 +214,7 @@ export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender }: Props) =>
       <directionalLight position={[3, 6, 4]} intensity={1.1} castShadow />
       <directionalLight position={[-3, 4, -2]} intensity={0.4} color="#d4a85a" />
       <Suspense fallback={null}>
-        <Avatar3D cfg={avatar} bodyScale={bodyScale} gender={gender} />
+        <Avatar3D cfg={avatar} bodyScale={bodyScale} gender={gender} glbUrl={glbUrl} />
         {overlay && overlay.mode === "flat" && <FlatPlane cfg={overlay} />}
         {overlay && (overlay.mode ?? "wrap") === "wrap" && (
           <WrappedGarment cfg={overlay} avatar={avatar} />
