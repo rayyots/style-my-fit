@@ -9,6 +9,8 @@ import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { AvatarConfig, bodyScaleFromHeight, defaultAvatar, deriveFromMeasurements, fetchAvatar, upsertAvatar } from "@/lib/avatar";
 import { AvatarPreview } from "@/components/AvatarPreview";
+import { Logo } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Step = 0 | 1 | 2;
 
@@ -76,11 +78,12 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-foreground/10 px-6 lg:px-12 py-5 flex items-center justify-between">
-        <span className="font-display text-xl tracking-[0.4em]">ATELIER</span>
-        <span className="font-mono-ed text-xs tracking-[0.3em] text-muted-foreground">
-          STEP {String(step + 1).padStart(2, "0")} / 03
+      <header className="border-b border-foreground/10 px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between">
+        <Logo to="/" />
+        <span className="font-mono-ed text-[10px] sm:text-xs tracking-[0.3em] text-muted-foreground">
+          STEP <span className="text-gold">{String(step + 1).padStart(2, "0")}</span> / 03
         </span>
+        <ThemeToggle />
       </header>
 
       <div className="grid lg:grid-cols-[1fr_1.1fr] min-h-[calc(100vh-65px)]">
@@ -195,10 +198,11 @@ const Onboarding = () => {
         </section>
 
         {/* Right: 3D preview */}
-        <section className="bg-secondary/40 border-l border-foreground/10 relative">
-          <AvatarPreview cfg={cfg} bodyScale={bodyScaleFromHeight(height)} />
+        <section className="bg-secondary/40 border-t lg:border-t-0 lg:border-l border-foreground/10 relative min-h-[55vh] lg:min-h-0">
+          <AvatarPreview cfg={cfg} bodyScale={bodyScaleFromHeight(height)} gender={gender} />
           <div className="absolute top-4 left-4 font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground">
-            LIVE PREVIEW · ROTATE WITH MOUSE
+            <span className="hidden md:inline">LIVE PREVIEW · ROTATE WITH MOUSE</span>
+            <span className="md:hidden">SWIPE TO ROTATE</span>
           </div>
         </section>
       </div>

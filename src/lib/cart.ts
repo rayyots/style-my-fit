@@ -11,8 +11,6 @@ export interface CartRow {
     price_cents: number;
     currency: string;
     images: string[];
-    purchase_type: "internal" | "external";
-    external_url: string | null;
     brand_id: string;
   };
 }
@@ -20,7 +18,7 @@ export interface CartRow {
 export async function listCart(userId: string): Promise<CartRow[]> {
   const { data, error } = await supabase
     .from("cart_items")
-    .select("id,product_id,size,quantity,product:products(id,name,price_cents,currency,images,purchase_type,external_url,brand_id)")
+    .select("id,product_id,size,quantity,product:products(id,name,price_cents,currency,images,brand_id)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw error;

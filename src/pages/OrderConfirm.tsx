@@ -42,8 +42,8 @@ const OrderConfirm = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-foreground/10 px-6 lg:px-12 py-4 flex items-center justify-between">
-        <Link to="/showroom" className="font-mono-ed text-xs tracking-[0.3em] hover:bg-accent px-2 py-1">← SHOWROOM</Link>
-        <span className="font-display text-xl tracking-[0.4em]">RECEIPT</span>
+        <Link to="/showroom" className="font-mono-ed text-xs tracking-[0.3em] hover:text-gold transition-colors">← SHOWROOM</Link>
+        <span className="font-display text-2xl tracking-[0.35em]"><span className="italic">K</span>O · RECEIPT</span>
         <span className="w-16" />
       </header>
 

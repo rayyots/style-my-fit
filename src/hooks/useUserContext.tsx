@@ -11,12 +11,13 @@ export interface UserCtx {
   sizeTier: SizeTier | null;
   recommendedSizes: SizeTier[];
   isAdmin: boolean;
+  bodyScale: number;
 }
 
 export function useUserContext(): UserCtx {
   const { user, loading: authLoading } = useAuth();
   const [ctx, setCtx] = useState<UserCtx>({
-    loading: true, profile: null, avatar: null, sizeTier: null, recommendedSizes: [], isAdmin: false,
+    loading: true, profile: null, avatar: null, sizeTier: null, recommendedSizes: [], isAdmin: false, bodyScale: 1,
   });
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export function useUserContext(): UserCtx {
       ]);
       const isAdmin = !!roles?.some((r: any) => r.role === "admin");
       let sizeTier = null, recommendedSizes: SizeTier[] = [];
+      let bodyScale = 1;
       if (profile?.height_cm && profile?.weight_kg) {
         const t = deriveSizeTiers({
           height_cm: Number(profile.height_cm),
@@ -38,8 +40,9 @@ export function useUserContext(): UserCtx {
         });
         sizeTier = t.primary;
         recommendedSizes = t.recommended;
+        bodyScale = Math.min(1.18, Math.max(0.82, Number(profile.height_cm) / 170));
       }
-      setCtx({ loading: false, profile, avatar: av, sizeTier, recommendedSizes, isAdmin });
+      setCtx({ loading: false, profile, avatar: av, sizeTier, recommendedSizes, isAdmin, bodyScale });
     })();
   }, [user, authLoading]);
 
