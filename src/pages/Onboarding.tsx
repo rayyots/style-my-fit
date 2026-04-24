@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
-import { AvatarConfig, defaultAvatar, deriveFromMeasurements, fetchAvatar, upsertAvatar } from "@/lib/avatar";
+import { AvatarConfig, bodyScaleFromHeight, defaultAvatar, deriveFromMeasurements, fetchAvatar, upsertAvatar } from "@/lib/avatar";
 import { AvatarPreview } from "@/components/AvatarPreview";
 
 type Step = 0 | 1 | 2;
@@ -196,7 +196,7 @@ const Onboarding = () => {
 
         {/* Right: 3D preview */}
         <section className="bg-secondary/40 border-l border-foreground/10 relative">
-          <AvatarPreview cfg={cfg} />
+          <AvatarPreview cfg={cfg} bodyScale={bodyScaleFromHeight(height)} />
           <div className="absolute top-4 left-4 font-mono-ed text-[10px] tracking-[0.3em] text-muted-foreground">
             LIVE PREVIEW · ROTATE WITH MOUSE
           </div>
