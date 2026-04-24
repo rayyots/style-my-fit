@@ -22,7 +22,7 @@ const Checkout = () => {
     if (!user) { nav("/auth"); return; }
     (async () => {
       const all = await listCart(user.id);
-      setItems(all.filter((i) => i.product.purchase_type === "internal"));
+      setItems(all);
     })();
   }, [user, loading]);
 
@@ -81,9 +81,9 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-foreground/10 px-6 lg:px-12 py-4 flex items-center justify-between">
-        <button onClick={() => nav(-1)} className="font-mono-ed text-xs tracking-[0.3em] hover:bg-accent px-2 py-1">← BACK</button>
-        <span className="font-display text-xl tracking-[0.4em]">CHECKOUT</span>
+      <header className="border-b border-foreground/10 px-6 lg:px-12 py-4 flex items-center justify-between bg-background/95 backdrop-blur sticky top-0 z-20">
+        <button onClick={() => nav(-1)} className="font-mono-ed text-xs tracking-[0.3em] hover:text-gold transition-colors">← BACK</button>
+        <span className="font-display text-2xl tracking-[0.35em]">CHECKOUT</span>
         <span className="w-16" />
       </header>
 
