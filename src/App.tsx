@@ -16,6 +16,9 @@ import Cart from "./pages/Cart.tsx";
 import Checkout from "./pages/Checkout.tsx";
 import OrderConfirm from "./pages/OrderConfirm.tsx";
 import Admin from "./pages/Admin.tsx";
+import Wishlist from "./pages/Wishlist.tsx";
+import Orders from "./pages/Orders.tsx";
+import OrderStatus from "./pages/OrderStatus.tsx";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +40,9 @@ const App = () => (
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/orders/:id" element={<OrderConfirm />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:id/status" element={<OrderStatus />} />
+              <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

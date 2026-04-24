@@ -2,26 +2,33 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { AvatarConfig, fetchAvatar } from "@/lib/avatar";
+import { AvatarConfig, fetchAvatar, fetchAvatarGlbUrl } from "@/lib/avatar";
 import { Showroom3D } from "@/components/Showroom3D";
 import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/hooks/useUserContext";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileNavTrigger } from "@/components/MobileNav";
+import { Heart } from "lucide-react";
 
 const Showroom = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
   const [avatar, setAvatar] = useState<AvatarConfig | null>(null);
+  const [glbUrl, setGlbUrl] = useState<string | null>(null);
   const { isAdmin, sizeTier, profile } = useUserContext();
 
   useEffect(() => {
     if (loading) return;
     if (!user) { navigate("/auth"); return; }
-    fetchAvatar(user.id).then((a) => {
+    (async () => {
+      const [a, g] = await Promise.all([
+        fetchAvatar(user.id),
+        fetchAvatarGlbUrl(user.id),
+      ]);
       if (!a) navigate("/onboarding");
-      else setAvatar(a);
-    });
+      else { setAvatar(a); setGlbUrl(g); }
+    })();
   }, [user, loading, navigate]);
 
   if (!avatar) {
@@ -35,10 +42,15 @@ const Showroom = () => {
   return (
     <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
       <header className="border-b border-foreground/10 px-4 sm:px-6 lg:px-12 py-3 flex items-center justify-between bg-background/90 backdrop-blur z-10">
-        <Logo to="/" />
+        <div className="flex items-center gap-2">
+          <MobileNavTrigger />
+          <Logo to="/" />
+        </div>
         <div className="hidden md:flex items-center gap-6 font-mono-ed text-[10px] tracking-[0.3em]">
           <span className="text-gold">SHOWROOM</span>
           <button onClick={() => navigate("/onboarding?edit=1")} className="hover:text-gold transition-colors">EDIT AVATAR</button>
+          <Link to="/wishlist" className="hover:text-gold transition-colors">WISHLIST</Link>
+          <Link to="/orders" className="hover:text-gold transition-colors">ORDERS</Link>
           <Link to="/cart" className="hover:text-gold transition-colors">CART</Link>
           {isAdmin && <Link to="/admin" className="hover:text-gold transition-colors">ADMIN</Link>}
         </div>
@@ -54,15 +66,13 @@ const Showroom = () => {
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-20 bg-background/95 backdrop-blur border-t border-gold/30 grid grid-cols-4 font-mono-ed text-[9px] tracking-[0.25em]">
         <button onClick={() => navigate("/onboarding?edit=1")} className="py-3 hover:text-gold">AVATAR</button>
+        <Link to="/wishlist" className="py-3 text-center hover:text-gold inline-flex items-center justify-center gap-1"><Heart size={11} /> WISH</Link>
         <Link to="/cart" className="py-3 text-center hover:text-gold">CART</Link>
-        {isAdmin
-          ? <Link to="/admin" className="py-3 text-center hover:text-gold">ADMIN</Link>
-          : <span className="py-3 text-center text-muted-foreground">FIT · {sizeTier ?? "—"}</span>}
-        <button onClick={signOut} className="py-3 text-center hover:text-destructive">EXIT</button>
+        <Link to="/orders" className="py-3 text-center hover:text-gold">ORDERS</Link>
       </nav>
 
       <div className="flex-1 relative">
-        <Showroom3D avatar={avatar} gender={profile?.gender} />
+        <Showroom3D avatar={avatar} gender={profile?.gender} glbUrl={glbUrl} />
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

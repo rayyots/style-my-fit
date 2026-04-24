@@ -10,6 +10,24 @@ export interface AvatarConfig {
   hair_color: string;
 }
 
+/** Where the user's Ready Player Me (or compatible) GLB avatar lives. */
+export async function fetchAvatarGlbUrl(userId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("profiles")
+    .select("avatar_glb_url")
+    .eq("id", userId)
+    .maybeSingle();
+  return (data as any)?.avatar_glb_url ?? null;
+}
+
+export async function saveAvatarGlbUrl(userId: string, url: string | null) {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_glb_url: url })
+    .eq("id", userId);
+  if (error) throw error;
+}
+
 /**
  * Compute an overall body scale from the user's height (cm).
  * 170 cm = 1.0. Clamped so very short / very tall users still render well.

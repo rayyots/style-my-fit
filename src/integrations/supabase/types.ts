@@ -124,6 +124,51 @@ export type Database = {
           },
         ]
       }
+      exchange_requests: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          id: string
+          order_id: string
+          order_item_id: string
+          original_size: string
+          product_id: string
+          reason: string | null
+          requested_size: string
+          status: Database["public"]["Enums"]["exchange_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          id?: string
+          order_id: string
+          order_item_id: string
+          original_size: string
+          product_id: string
+          reason?: string | null
+          requested_size: string
+          status?: Database["public"]["Enums"]["exchange_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          order_item_id?: string
+          original_size?: string
+          product_id?: string
+          reason?: string | null
+          requested_size?: string
+          status?: Database["public"]["Enums"]["exchange_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -269,6 +314,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_glb_url: string | null
           created_at: string
           gender: string | null
           height_cm: number | null
@@ -278,6 +324,7 @@ export type Database = {
           weight_kg: number | null
         }
         Insert: {
+          avatar_glb_url?: string | null
           created_at?: string
           gender?: string | null
           height_cm?: number | null
@@ -287,6 +334,7 @@ export type Database = {
           weight_kg?: number | null
         }
         Update: {
+          avatar_glb_url?: string | null
           created_at?: string
           gender?: string | null
           height_cm?: number | null
@@ -318,6 +366,27 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlist_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -333,7 +402,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      order_status: "pending" | "paid" | "shipped" | "cancelled"
+      exchange_status:
+        | "requested"
+        | "approved"
+        | "rejected"
+        | "completed"
+        | "cancelled"
+      order_status: "pending" | "paid" | "shipped" | "cancelled" | "delivered"
       payment_method: "cod" | "mock_card"
       product_gender: "male" | "female" | "unisex"
     }
@@ -464,7 +539,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      order_status: ["pending", "paid", "shipped", "cancelled"],
+      exchange_status: [
+        "requested",
+        "approved",
+        "rejected",
+        "completed",
+        "cancelled",
+      ],
+      order_status: ["pending", "paid", "shipped", "cancelled", "delivered"],
       payment_method: ["cod", "mock_card"],
       product_gender: ["male", "female", "unisex"],
     },
