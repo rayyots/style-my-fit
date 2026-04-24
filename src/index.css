@@ -8,41 +8,46 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Editorial fashion: ivory canvas, ink type, electric chartreuse accent */
-    --background: 40 30% 97%;
-    --foreground: 0 0% 8%;
+    /* KO — Light luxury: warm porcelain, deep ink, brushed gold */
+    --background: 36 28% 96%;
+    --foreground: 24 15% 10%;
 
-    --card: 40 30% 99%;
-    --card-foreground: 0 0% 8%;
+    --card: 36 30% 98%;
+    --card-foreground: 24 15% 10%;
 
-    --popover: 40 30% 99%;
-    --popover-foreground: 0 0% 8%;
+    --popover: 36 30% 98%;
+    --popover-foreground: 24 15% 10%;
 
-    --primary: 0 0% 8%;
-    --primary-foreground: 40 30% 97%;
+    --primary: 24 15% 10%;
+    --primary-foreground: 36 28% 96%;
 
-    --secondary: 40 15% 92%;
-    --secondary-foreground: 0 0% 8%;
+    --secondary: 36 20% 90%;
+    --secondary-foreground: 24 15% 10%;
 
-    --muted: 40 15% 92%;
-    --muted-foreground: 0 0% 38%;
+    --muted: 36 18% 90%;
+    --muted-foreground: 24 10% 40%;
 
-    --accent: 70 95% 55%;
-    --accent-foreground: 0 0% 8%;
+    --accent: 38 65% 52%;
+    --accent-foreground: 24 15% 10%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 40 30% 97%;
+    --gold: 38 65% 52%;
+    --gold-foreground: 24 15% 10%;
 
-    --border: 40 10% 86%;
-    --input: 40 10% 86%;
-    --ring: 0 0% 8%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 36 28% 96%;
 
-    --radius: 0.25rem;
+    --border: 30 12% 84%;
+    --input: 30 12% 84%;
+    --ring: 38 65% 52%;
 
-    --gradient-runway: linear-gradient(135deg, hsl(40 30% 97%), hsl(40 15% 92%));
-    --gradient-spotlight: radial-gradient(ellipse at top, hsl(70 95% 55% / 0.18), transparent 60%);
-    --shadow-editorial: 0 30px 80px -20px hsl(0 0% 8% / 0.25);
-    --shadow-soft: 0 10px 30px -10px hsl(0 0% 8% / 0.12);
+    --radius: 0.125rem;
+
+    --gradient-runway: linear-gradient(135deg, hsl(36 28% 96%), hsl(36 18% 88%));
+    --gradient-spotlight: radial-gradient(ellipse at top, hsl(38 65% 52% / 0.18), transparent 65%);
+    --gradient-gold: linear-gradient(135deg, hsl(38 80% 60%), hsl(38 55% 42%));
+    --shadow-editorial: 0 30px 80px -20px hsl(24 15% 10% / 0.25);
+    --shadow-soft: 0 10px 30px -10px hsl(24 15% 10% / 0.12);
+    --shadow-luxe: 0 20px 60px -15px hsl(38 65% 35% / 0.25);
     --transition-silk: cubic-bezier(0.65, 0, 0.35, 1);
 
     --sidebar-background: 0 0% 98%;
@@ -56,25 +61,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 0 0% 6%;
-    --foreground: 40 30% 96%;
-    --card: 0 0% 9%;
-    --card-foreground: 40 30% 96%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 40 30% 96%;
-    --primary: 40 30% 96%;
-    --primary-foreground: 0 0% 8%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 40 30% 96%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 70 95% 55%;
-    --accent-foreground: 0 0% 8%;
-    --destructive: 0 62.8% 45%;
-    --destructive-foreground: 40 30% 96%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 40 30% 96%;
+    /* KO — Dark luxury: charcoal velvet, soft cream, brushed gold */
+    --background: 24 8% 6%;
+    --foreground: 36 25% 94%;
+    --card: 24 8% 9%;
+    --card-foreground: 36 25% 94%;
+    --popover: 24 8% 9%;
+    --popover-foreground: 36 25% 94%;
+    --primary: 36 25% 94%;
+    --primary-foreground: 24 8% 6%;
+    --secondary: 24 8% 13%;
+    --secondary-foreground: 36 25% 94%;
+    --muted: 24 6% 14%;
+    --muted-foreground: 36 10% 65%;
+    --accent: 38 70% 58%;
+    --accent-foreground: 24 8% 6%;
+    --gold: 38 70% 58%;
+    --gold-foreground: 24 8% 6%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 36 25% 94%;
+    --border: 24 6% 18%;
+    --input: 24 6% 18%;
+    --ring: 38 70% 58%;
+    --gradient-runway: linear-gradient(135deg, hsl(24 8% 6%), hsl(24 8% 11%));
+    --gradient-spotlight: radial-gradient(ellipse at top, hsl(38 70% 58% / 0.22), transparent 65%);
+    --gradient-gold: linear-gradient(135deg, hsl(38 80% 65%), hsl(38 60% 45%));
+    --shadow-editorial: 0 30px 80px -20px hsl(0 0% 0% / 0.6);
+    --shadow-soft: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
+    --shadow-luxe: 0 20px 60px -15px hsl(38 70% 30% / 0.4);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -95,15 +109,41 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
     font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
   }
 
   .font-display {
-    font-family: 'Playfair Display', 'Times New Roman', serif;
-    letter-spacing: -0.02em;
+    font-family: 'Cormorant Garamond', 'Playfair Display', 'Times New Roman', serif;
+    letter-spacing: -0.015em;
+    font-weight: 500;
   }
 
   .font-mono-ed {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     letter-spacing: 0.02em;
+  }
+
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
+  .bg-gradient-gold {
+    background-image: var(--gradient-gold);
+  }
+
+  /* Luxury hairline divider */
+  .hairline {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--gold) / 0.6),
+      transparent
+    );
+    height: 1px;
   }
 }
