@@ -4,6 +4,8 @@ import { AvatarConfig } from "@/lib/avatar";
 
 interface Props {
   cfg: AvatarConfig;
+  /** Optional overall body scale (drives perceived height). Default 1. */
+  bodyScale?: number;
   rotateSpeed?: number;
 }
 
@@ -11,11 +13,12 @@ interface Props {
  * Parametric low-poly avatar built from primitives.
  * Scale-driven morph: shoulders/waist/hips/torso/legs control geometry scale.
  */
-export const Avatar3D = ({ cfg }: Props) => {
+export const Avatar3D = ({ cfg, bodyScale = 1 }: Props) => {
   const ref = useRef<Group>(null);
 
+  // Outer group = overall height/build (height comes from bodyScale, weight subtly widens)
   return (
-    <group ref={ref} position={[0, -1.2, 0]} scale={[1, cfg.torso, 1]}>
+    <group ref={ref} position={[0, -1.2, 0]} scale={[bodyScale, cfg.torso * bodyScale, bodyScale]}>
       {/* Head */}
       <mesh position={[0, 2.55, 0]} castShadow>
         <sphereGeometry args={[0.22, 32, 32]} />

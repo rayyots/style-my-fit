@@ -10,6 +10,15 @@ export interface AvatarConfig {
   hair_color: string;
 }
 
+/**
+ * Compute an overall body scale from the user's height (cm).
+ * 170 cm = 1.0. Clamped so very short / very tall users still render well.
+ */
+export function bodyScaleFromHeight(height_cm?: number | null): number {
+  if (!height_cm) return 1;
+  return Math.min(1.18, Math.max(0.82, height_cm / 170));
+}
+
 export const defaultAvatar: AvatarConfig = {
   shoulders: 1.0,
   waist: 1.0,
