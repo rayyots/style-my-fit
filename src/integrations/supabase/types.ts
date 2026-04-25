@@ -16,8 +16,10 @@ export type Database = {
     Tables: {
       avatars: {
         Row: {
+          body_type: string
           created_at: string
           hair_color: string
+          height_cm: number | null
           hips: number
           id: string
           legs: number
@@ -29,8 +31,10 @@ export type Database = {
           waist: number
         }
         Insert: {
+          body_type?: string
           created_at?: string
           hair_color?: string
+          height_cm?: number | null
           hips?: number
           id?: string
           legs?: number
@@ -42,8 +46,10 @@ export type Database = {
           waist?: number
         }
         Update: {
+          body_type?: string
           created_at?: string
           hair_color?: string
+          height_cm?: number | null
           hips?: number
           id?: string
           legs?: number
@@ -259,6 +265,45 @@ export type Database = {
         }
         Relationships: []
       }
+      outfits: {
+        Row: {
+          avatar_config: Json
+          created_at: string
+          id: string
+          is_public: boolean
+          items: Json
+          likes: number
+          name: string
+          style_vibe: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_config?: Json
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          items?: Json
+          likes?: number
+          name?: string
+          style_vibe?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_config?: Json
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          items?: Json
+          likes?: number
+          name?: string
+          style_vibe?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           brand_id: string
@@ -320,6 +365,7 @@ export type Database = {
           height_cm: number | null
           id: string
           name: string | null
+          style_vibe: string | null
           updated_at: string
           weight_kg: number | null
         }
@@ -330,6 +376,7 @@ export type Database = {
           height_cm?: number | null
           id: string
           name?: string | null
+          style_vibe?: string | null
           updated_at?: string
           weight_kg?: number | null
         }
@@ -340,6 +387,7 @@ export type Database = {
           height_cm?: number | null
           id?: string
           name?: string | null
+          style_vibe?: string | null
           updated_at?: string
           weight_kg?: number | null
         }
