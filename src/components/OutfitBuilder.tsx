@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Drawer, DrawerContent, DrawerTrigger } from "vaul";
+import { Drawer } from "vaul";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Save, Shirt, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
