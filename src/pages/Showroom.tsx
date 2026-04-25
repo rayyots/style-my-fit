@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { AvatarConfig, fetchAvatar, fetchAvatarGlbUrl } from "@/lib/avatar";
 import { Showroom3D } from "@/components/Showroom3D";
@@ -16,6 +16,7 @@ const Showroom = () => {
   const { user, loading, signOut } = useAuth();
   const [avatar, setAvatar] = useState<AvatarConfig | null>(null);
   const [glbUrl, setGlbUrl] = useState<string | null>(null);
+  const [enteringBrand, setEnteringBrand] = useState<string | null>(null);
   const { isAdmin, sizeTier, profile } = useUserContext();
 
   useEffect(() => {
@@ -72,7 +73,12 @@ const Showroom = () => {
       </nav>
 
       <div className="flex-1 relative">
-        <Showroom3D avatar={avatar} gender={profile?.gender} glbUrl={glbUrl} />
+        <Showroom3D
+          avatar={avatar}
+          gender={profile?.gender}
+          glbUrl={glbUrl}
+          onEnterStart={(slug) => setEnteringBrand(slug)}
+        />
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,6 +88,32 @@ const Showroom = () => {
           <span className="hidden md:inline">CLICK A BRAND TO ENTER · DRAG TO LOOK · SCROLL TO ZOOM</span>
           <span className="md:hidden">TAP A BRAND · SWIPE TO LOOK · PINCH TO ZOOM</span>
         </motion.div>
+
+        {/* Cinematic fly-through fade — appears during the camera flight */}
+        <AnimatePresence>
+          {enteringBrand && (
+            <motion.div
+              key="flash"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1] }}
+              className="pointer-events-none absolute inset-0 bg-background z-30 flex items-center justify-center"
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                className="text-center"
+              >
+                <div className="font-mono-ed text-[10px] tracking-[0.5em] text-gold mb-3">— ENTERING —</div>
+                <div className="font-display text-4xl tracking-[0.3em] uppercase">
+                  {enteringBrand.replace(/-/g, " ")}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

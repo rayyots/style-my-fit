@@ -39,7 +39,12 @@ export async function addToWishlist(userId: string, productId: string) {
   const { error } = await supabase
     .from("wishlist_items")
     .insert({ user_id: userId, product_id: productId });
-  if (error && !`${error.message}`.includes("duplicate")) throw error;
+  if (!error) return;
+  // 23505 = unique_violation. Treat as success (already wished).
+  const code = (error as any).code as string | undefined;
+  const msg = `${error.message ?? ""}`.toLowerCase();
+  if (code === "23505" || msg.includes("duplicate") || msg.includes("unique")) return;
+  throw error;
 }
 
 export async function removeFromWishlist(userId: string, productId: string) {

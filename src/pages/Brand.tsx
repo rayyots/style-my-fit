@@ -8,6 +8,9 @@ import { ALL_SIZES, SizeTier } from "@/lib/sizing";
 import { formatPrice } from "@/lib/cart";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { WishlistHeart } from "@/components/WishlistHeart";
+import { listWishlistIds } from "@/lib/wishlist";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Brand { id: string; slug: string; name: string; tagline: string | null; description: string | null; cover_image: string | null; }
 interface Product {
@@ -19,10 +22,12 @@ const BrandPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile, recommendedSizes, sizeTier, isAdmin } = useUserContext();
+  const { user } = useAuth();
 
   const [brand, setBrand] = useState<Brand | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [wishedSet, setWishedSet] = useState<Set<string>>(new Set());
 
   const [genderFilter, setGenderFilter] = useState<"all"|"male"|"female"|"unisex">(
     (profile?.gender === "male" || profile?.gender === "female") ? (profile.gender as any) : "all"
@@ -45,6 +50,12 @@ const BrandPage = () => {
       setLoading(false);
     })();
   }, [id]);
+
+  // Pre-fetch wishlist ids once per user so each heart knows its initial state without N queries.
+  useEffect(() => {
+    if (!user) return;
+    listWishlistIds(user.id).then(setWishedSet);
+  }, [user]);
 
   useEffect(() => {
     if (smartSize && recommendedSizes.length && sizeFilter.length === 0) {
@@ -159,6 +170,21 @@ const BrandPage = () => {
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground font-mono-ed text-[10px] tracking-[0.3em]">NO IMAGE</div>
                     )}
+                    {/* Wishlist heart, top-right of card */}
+                    <div className="absolute top-2 right-2">
+                      <WishlistHeart
+                        productId={p.id}
+                        wishedSet={wishedSet}
+                        onToggle={(next) => {
+                          setWishedSet((s) => {
+                            const n = new Set(s);
+                            if (next) n.add(p.id);
+                            else n.delete(p.id);
+                            return n;
+                          });
+                        }}
+                      />
+                    </div>
                     <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-gold text-gold-foreground py-2 text-center font-mono-ed text-[10px] tracking-[0.3em]">
                       TRY ON →
                     </div>

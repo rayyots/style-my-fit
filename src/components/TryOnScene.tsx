@@ -69,7 +69,8 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
   texture.needsUpdate = true;
 
   const garment: GarmentKind = cfg.garment ?? "top";
-  const inflate = 0.04 + Math.max(0, cfg.z) * 0.5;
+  // base inflate is bigger to wrap the chunky stylized avatar without clipping
+  const inflate = 0.06 + Math.max(0, cfg.z) * 0.5;
 
   const Material = (
     <meshStandardMaterial
@@ -87,8 +88,8 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
     return (
       <group position={[cfg.x, 0, 0]} rotation={[0, cfg.rotation, 0]}>
         {[-1, 1].map((side) => (
-          <mesh key={side} position={[side * 0.13 * avatar.hips, yFoot + cfg.y * 0.1, 0.07]}>
-            <boxGeometry args={[0.16 * cfg.scale, 0.09 * cfg.scale, 0.34 * cfg.scale]} />
+          <mesh key={side} position={[side * 0.16 * avatar.hips, yFoot + cfg.y * 0.1, 0.07]}>
+            <boxGeometry args={[0.20 * cfg.scale, 0.10 * cfg.scale, 0.40 * cfg.scale]} />
             {Material}
           </mesh>
         ))}
@@ -99,10 +100,10 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
   // ───── hat: dome above head
   if (garment === "hat") {
     return (
-      <group position={[cfg.x, 1.65 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
+      <group position={[cfg.x, 1.78 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
         <mesh>
           <sphereGeometry
-            args={[0.24 * cfg.scale, 24, 24, 0, Math.PI * 2, 0, Math.PI / 2]}
+            args={[0.40 * cfg.scale, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]}
           />
           {Material}
         </mesh>
@@ -113,8 +114,8 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
   // ───── accessory: small plane at chest
   if (garment === "accessory") {
     return (
-      <mesh position={[cfg.x, 0.5 + cfg.y, 0.4]} rotation={[0, cfg.rotation, 0]}>
-        <planeGeometry args={[0.5 * cfg.scale, 0.5 * cfg.scale]} />
+      <mesh position={[cfg.x, 0.5 + cfg.y, 0.45]} rotation={[0, cfg.rotation, 0]}>
+        <planeGeometry args={[0.55 * cfg.scale, 0.55 * cfg.scale]} />
         {Material}
       </mesh>
     );
@@ -122,21 +123,21 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
 
   // ───── bottom: pair of leg cylinders
   if (garment === "bottom") {
-    const top = 0.32 * avatar.hips + inflate;
-    const bot = 0.12 * avatar.hips + inflate;
-    const len = 1.05 * cfg.scale;
+    const top = 0.42 * avatar.hips + inflate;
+    const bot = 0.16 * avatar.hips + inflate;
+    const len = 1.20 * cfg.scale;
     return (
-      <group position={[cfg.x, -0.25 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
+      <group position={[cfg.x, -0.30 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
         {/* Yoke / waistband */}
         <mesh>
           <cylinderGeometry
-            args={[0.34 * avatar.hips + inflate, 0.32 * avatar.hips + inflate, 0.18, 32, 1, true]}
+            args={[0.44 * avatar.hips + inflate, 0.40 * avatar.hips + inflate, 0.20, 32, 1, true]}
           />
           {Material}
         </mesh>
         {[-1, 1].map((side) => (
-          <mesh key={side} position={[side * 0.13 * avatar.hips, -0.55, 0]}>
-            <cylinderGeometry args={[top * 0.5, bot, len, 24, 1, true]} />
+          <mesh key={side} position={[side * 0.16 * avatar.hips, -0.62, 0]}>
+            <cylinderGeometry args={[top * 0.45, bot, len, 28, 1, true]} />
             {Material}
           </mesh>
         ))}
@@ -147,13 +148,13 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
   // ───── dress: full-length flowing silhouette
   if (garment === "dress") {
     return (
-      <group position={[cfg.x, -0.05 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
+      <group position={[cfg.x, -0.10 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
         <mesh castShadow>
           <cylinderGeometry
             args={[
-              0.34 * avatar.shoulders + inflate,
-              0.5 * avatar.hips + inflate,
-              1.55 * cfg.scale,
+              0.42 * avatar.shoulders + inflate,
+              0.60 * avatar.hips + inflate,
+              1.75 * cfg.scale,
               48,
               8,
               true,
@@ -167,13 +168,13 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
 
   // ───── top / jacket: torso cylinder, jacket slightly inflated
   const jacket = garment === "jacket";
-  const radTop = (jacket ? 0.36 : 0.34) * avatar.shoulders + (jacket ? inflate * 1.6 : inflate);
-  const radBot = (jacket ? 0.34 : 0.3) * avatar.waist + (jacket ? inflate * 1.4 : inflate);
+  const radTop = (jacket ? 0.46 : 0.42) * avatar.shoulders + (jacket ? inflate * 1.6 : inflate);
+  const radBot = (jacket ? 0.44 : 0.38) * avatar.waist + (jacket ? inflate * 1.4 : inflate);
   return (
-    <group position={[cfg.x, 0.55 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
+    <group position={[cfg.x, 0.45 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
       <mesh castShadow>
         <cylinderGeometry
-          args={[radTop, radBot, 0.95 * cfg.scale, 48, 6, true]}
+          args={[radTop, radBot, 1.05 * cfg.scale, 48, 6, true]}
         />
         {Material}
       </mesh>
@@ -183,10 +184,10 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
           {[-1, 1].map((side) => (
             <mesh
               key={side}
-              position={[side * (0.36 * avatar.shoulders + 0.04), -0.1, 0]}
+              position={[side * (0.42 * avatar.shoulders + 0.06), -0.05, 0]}
               rotation={[0, 0, side * 0.05]}
             >
-              <cylinderGeometry args={[0.1, 0.08, 0.55 * cfg.scale, 16, 1, true]} />
+              <cylinderGeometry args={[0.14, 0.11, 0.65 * cfg.scale, 18, 1, true]} />
               {Material}
             </mesh>
           ))}
