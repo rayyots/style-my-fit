@@ -49,6 +49,7 @@ const Showroom = () => {
         </div>
         <div className="hidden md:flex items-center gap-6 font-mono-ed text-[10px] tracking-[0.3em]">
           <span className="text-gold">SHOWROOM</span>
+          <Link to="/styler" className="hover:text-gold transition-colors">STYLER</Link>
           <button onClick={() => navigate("/onboarding?edit=1")} className="hover:text-gold transition-colors">EDIT AVATAR</button>
           <Link to="/wishlist" className="hover:text-gold transition-colors">WISHLIST</Link>
           <Link to="/orders" className="hover:text-gold transition-colors">ORDERS</Link>
