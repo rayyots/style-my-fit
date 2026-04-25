@@ -197,9 +197,11 @@ interface Props {
   avatar: AvatarConfig;
   gender?: string;
   glbUrl?: string | null;
+  /** Fired when a brand gate is clicked (so the page can show a fade overlay). */
+  onEnterStart?: (brandSlug: string) => void;
 }
 
-export const Showroom3D = ({ avatar, gender, glbUrl }: Props) => {
+export const Showroom3D = ({ avatar, gender, glbUrl, onEnterStart }: Props) => {
   const [brands, setBrands] = useState<BrandRow[]>([]);
   const [flying, setFlying] = useState<{
     brand: BrandRow;
@@ -222,6 +224,7 @@ export const Showroom3D = ({ avatar, gender, glbUrl }: Props) => {
   const handleEnter = (b: BrandRow, pos: [number, number, number], rotY: number) => {
     if (flying) return;
     setFlying({ brand: b, pos, rotY });
+    onEnterStart?.(b.slug);
   };
 
   const handleArrived = () => {
