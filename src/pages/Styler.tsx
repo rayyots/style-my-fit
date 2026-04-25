@@ -24,10 +24,7 @@ import { MobileNavTrigger } from "@/components/MobileNav";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useUserContext } from "@/hooks/useUserContext";
-import {
-  Sliders,
-  TextureLoader,
-} from "lucide-react";
+import { Sliders } from "lucide-react";
 
 /** Render an outfit item as a colored mesh layer wrapping the avatar. */
 const OutfitMeshes = ({
