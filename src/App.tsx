@@ -19,6 +19,7 @@ import Admin from "./pages/Admin.tsx";
 import Wishlist from "./pages/Wishlist.tsx";
 import Orders from "./pages/Orders.tsx";
 import OrderStatus from "./pages/OrderStatus.tsx";
+import Styler from "./pages/Styler.tsx";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/showroom" element={<Showroom />} />
+              <Route path="/styler" element={<Styler />} />
               <Route path="/brand/:id" element={<Brand />} />
               <Route path="/tryon/:id" element={<TryOn />} />
               <Route path="/cart" element={<Cart />} />
