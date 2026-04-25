@@ -1,7 +1,8 @@
 import { Suspense, useMemo, useRef } from "react";
-import { Group, LatheGeometry, Vector2 } from "three";
+import { Box3, Group, LatheGeometry, Mesh, MeshStandardMaterial, Vector2, Vector3 } from "three";
 import { useGLTF } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { AvatarConfig } from "@/lib/avatar";
 
 interface Props {
@@ -26,7 +27,84 @@ export const Avatar3D = ({ cfg, bodyScale = 1, gender = "nonbinary", glbUrl }: P
       </Suspense>
     );
   }
-  return <StylizedAvatar cfg={cfg} bodyScale={bodyScale} gender={gender} />;
+  return (
+    <Suspense fallback={<StylizedAvatar cfg={cfg} bodyScale={bodyScale} gender={gender} />}>
+      <OBJAvatar cfg={cfg} bodyScale={bodyScale} url="/avatars/ko-default.obj" skin={cfg.skin_tone} />
+    </Suspense>
+  );
+};
+
+/* ───────── Default KO sculpted OBJ avatar ─────────
+ * Loads the bundled .obj, normalizes its size so the head sits ~2.55m and the
+ * feet rest on y=0, applies a skin-toned matte material, and adds the same
+ * subtle idle-breath as the other avatars.
+ */
+const OBJAvatar = ({
+  url,
+  bodyScale,
+  cfg,
+  skin,
+}: {
+  url: string;
+  bodyScale: number;
+  cfg: AvatarConfig;
+  skin: string;
+}) => {
+  const ref = useRef<Group>(null);
+  const obj = useLoader(OBJLoader, url);
+
+  // Clone, fit to a target height (~1.8 world units), apply matte skin material.
+  const { fitted, fitScale, yOffset } = useMemo(() => {
+    const clone = obj.clone(true);
+    const mat = new MeshStandardMaterial({
+      color: skin,
+      roughness: 0.62,
+      metalness: 0.02,
+    });
+    clone.traverse((child) => {
+      const mesh = child as Mesh;
+      if ((mesh as any).isMesh) {
+        mesh.material = mat;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        if (mesh.geometry && !mesh.geometry.attributes.normal) {
+          mesh.geometry.computeVertexNormals();
+        }
+      }
+    });
+    const box = new Box3().setFromObject(clone);
+    const size = new Vector3();
+    const center = new Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+    // Target ~1.8 world units tall (matches our procedural avatar's range).
+    const targetH = 1.8;
+    const s = size.y > 0 ? targetH / size.y : 1;
+    // After scaling, center horizontally and place feet on y = -1.2 (consistent
+    // with the other avatars in this scene).
+    const yOff = -1.2 - box.min.y * s;
+    return { fitted: clone, fitScale: s, yOffset: yOff };
+  }, [obj, skin]);
+
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    const breath = 1 + Math.sin(t * 1.2) * 0.008;
+    const sx = bodyScale * fitScale * breath;
+    const sy = bodyScale * fitScale * cfg.torso * breath;
+    const sz = bodyScale * fitScale * breath;
+    ref.current.scale.set(sx, sy, sz);
+  });
+
+  return (
+    <group
+      ref={ref}
+      position={[0, yOffset, 0]}
+      scale={[bodyScale * fitScale, bodyScale * fitScale * cfg.torso, bodyScale * fitScale]}
+    >
+      <primitive object={fitted} />
+    </group>
+  );
 };
 
 /* ───────────── Ready Player Me / GLB avatar ───────────── */
