@@ -1,6 +1,7 @@
 import { Suspense, useMemo, useRef } from "react";
 import { Group, LatheGeometry, Vector2 } from "three";
 import { useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { AvatarConfig } from "@/lib/avatar";
 
 interface Props {
@@ -31,14 +32,18 @@ export const Avatar3D = ({ cfg, bodyScale = 1, gender = "nonbinary", glbUrl }: P
 /* ───────────── Ready Player Me / GLB avatar ───────────── */
 const GLBAvatar = ({ url, bodyScale, cfg }: { url: string; bodyScale: number; cfg: AvatarConfig }) => {
   const { scene } = useGLTF(url) as any;
-  // RPM full-bodies are ~1.8m and stand on Y=0; pull down so feet touch the contact-shadow plane.
-  const torsoStretch = cfg.torso;
+  const ref = useRef<Group>(null);
+  // Idle breathing — subtle full-body scale oscillation around the bind pose.
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    const breath = 1 + Math.sin(t * 1.2) * 0.006;
+    ref.current.scale.set(bodyScale * breath, bodyScale * cfg.torso * breath, bodyScale * breath);
+  });
   return (
-    <primitive
-      object={scene}
-      position={[0, -1.2, 0]}
-      scale={[bodyScale, bodyScale * torsoStretch, bodyScale]}
-    />
+    <group ref={ref} position={[0, -1.2, 0]} scale={[bodyScale, bodyScale * cfg.torso, bodyScale]}>
+      <primitive object={scene} />
+    </group>
   );
 };
 
@@ -51,6 +56,14 @@ const StylizedAvatar = ({ cfg, bodyScale = 1, gender = "nonbinary" }: Props) => 
   const ref = useRef<Group>(null);
   const isFemale = gender === "female";
   const isMale = gender === "male";
+
+  // Idle breathing — subtle chest oscillation.
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    const breath = 1 + Math.sin(t * 1.2) * 0.012;
+    ref.current.scale.set(bodyScale * breath, cfg.torso * bodyScale * breath, bodyScale * breath);
+  });
 
   // soft cartoon palette
   const skin = cfg.skin_tone;
