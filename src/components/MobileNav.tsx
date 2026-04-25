@@ -62,6 +62,7 @@ export const MobileNavTrigger = () => {
         <nav className="flex-1 overflow-y-auto py-2">
           {[
             { l: "SHOWROOM", to: "/showroom" },
+            { l: "STYLER", to: "/styler" },
             { l: "WISHLIST", to: "/wishlist" },
             { l: "CART", to: "/cart" },
             { l: "ORDERS", to: "/orders" },
