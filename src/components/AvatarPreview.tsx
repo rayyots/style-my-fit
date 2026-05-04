@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, SoftShadows } from "@react-three/drei";
+import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
 import { Suspense } from "react";
 import { Avatar3D } from "./Avatar3D";
 import { AvatarConfig } from "@/lib/avatar";
