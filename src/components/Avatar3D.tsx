@@ -64,8 +64,9 @@ const OBJAvatar = ({
   const ref = useRef<Group>(null);
   const obj = useLoader(OBJLoader, url);
 
-  // Hyper-clean Showroom skin material: physical, soft sheen, faint clearcoat,
-  // tinted subsurface-ish base. Cheap, reads as premium under softbox light.
+  // Premium skin material + size normalization. Per-region body shaping is
+  // applied via group-level non-uniform scale below (NOT per-vertex, which
+  // warps multi-mesh OBJs around their individual local origins).
   const { fitted, fitScale, yOffset } = useMemo(() => {
     const clone = obj.clone(true);
     const skinCol = new Color(skin);
@@ -80,82 +81,36 @@ const OBJAvatar = ({
       clearcoatRoughness: 0.6,
       emissive: skinCol.clone().multiplyScalar(0.04),
     });
-
-    // Pre-compute bounds first (un-deformed local coords).
-    const preBox = new Box3().setFromObject(clone);
-    const preSize = new Vector3();
-    preBox.getSize(preSize);
-    const minY = preBox.min.y;
-    const H = preSize.y || 1;
-
-    // Per-region radial deformation driven by parametric sliders.
-    // Map normalized height t∈[0..1] (feet→head) to a radial multiplier.
-    const radiusFactor = (t: number) => {
-      // shoulders peak around t≈0.78, waist around 0.55, hips around 0.42, legs<0.42
-      const s = cfg.shoulders;
-      const w = cfg.waist;
-      const h = cfg.hips;
-      const l = cfg.legs;
-      // smooth gaussian bumps
-      const g = (peak: number, sigma: number) =>
-        Math.exp(-((t - peak) ** 2) / (2 * sigma * sigma));
-      const base =
-        l * g(0.18, 0.18) * 0.55 + // calves/thighs
-        h * g(0.42, 0.10) * 1.0 + // hips
-        w * g(0.55, 0.08) * 0.9 + // waist
-        s * g(0.78, 0.10) * 1.0 + // shoulders
-        0.6 * g(0.95, 0.08); // head/neck (kept stable)
-      // normalize so a config of all 1.0 returns ~1.0
-      const norm =
-        1 * (Math.exp(-((t - 0.18) ** 2) / 0.0648) * 0.55 +
-          Math.exp(-((t - 0.42) ** 2) / 0.02) * 1.0 +
-          Math.exp(-((t - 0.55) ** 2) / 0.0128) * 0.9 +
-          Math.exp(-((t - 0.78) ** 2) / 0.02) * 1.0 +
-          Math.exp(-((t - 0.95) ** 2) / 0.0128) * 0.6);
-      return norm > 0 ? base / norm : 1;
-    };
-
     clone.traverse((child) => {
       const mesh = child as Mesh;
       if (!(mesh as any).isMesh) return;
       mesh.material = mat;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      const geo = mesh.geometry as BufferGeometry;
-      if (geo && geo.attributes.position) {
-        const pos = geo.attributes.position as any;
-        for (let i = 0; i < pos.count; i++) {
-          const x = pos.getX(i);
-          const y = pos.getY(i);
-          const z = pos.getZ(i);
-          const t = (y - minY) / H; // 0..1 along body
-          const f = radiusFactor(t);
-          // radial scale around Y axis
-          pos.setX(i, x * f);
-          pos.setZ(i, z * f);
-        }
-        pos.needsUpdate = true;
-        geo.computeVertexNormals();
+      if (mesh.geometry && !mesh.geometry.attributes.normal) {
+        mesh.geometry.computeVertexNormals();
       }
     });
-
     const box = new Box3().setFromObject(clone);
     const size = new Vector3();
     box.getSize(size);
-    const targetH = 1.8 * cfg.torso; // torso slider stretches/compresses overall height
+    const targetH = 1.8;
     const s = size.y > 0 ? targetH / size.y : 1;
     const yOff = -1.2 - box.min.y * s;
     return { fitted: clone, fitScale: s, yOffset: yOff };
-  }, [obj, skin, cfg.shoulders, cfg.waist, cfg.hips, cfg.legs, cfg.torso]);
+  }, [obj, skin]);
 
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     const breath = 1 + Math.sin(t * 1.2) * 0.008;
+    // Non-uniform body shaping driven by parametric sliders, applied at the
+    // group level (avoids warping multi-mesh OBJs).
+    const widthAvg = (cfg.shoulders + cfg.waist + cfg.hips) / 3;
     ref.current.scale.set(
-      bodyScale * fitScale * breath,
-      bodyScale * fitScale * breath,
-      bodyScale * fitScale * breath,
+      bodyScale * fitScale * widthAvg * breath,
+      bodyScale * fitScale * cfg.torso * breath,
+      bodyScale * fitScale * widthAvg * breath,
     );
   });
 
@@ -163,7 +118,7 @@ const OBJAvatar = ({
     <group
       ref={ref}
       position={[0, yOffset, 0]}
-      scale={[bodyScale * fitScale, bodyScale * fitScale, bodyScale * fitScale]}
+      scale={[bodyScale * fitScale, bodyScale * fitScale * cfg.torso, bodyScale * fitScale]}
     >
       <primitive object={fitted} />
     </group>
