@@ -1,7 +1,7 @@
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
-import { Suspense, useMemo, MutableRefObject } from "react";
-import { TextureLoader, DoubleSide, RepeatWrapping } from "three";
+import { Suspense, useMemo, useRef, MutableRefObject } from "react";
+import { TextureLoader, DoubleSide, ClampToEdgeWrapping, Mesh } from "three";
 import { Avatar3D } from "./Avatar3D";
 import { AvatarConfig } from "@/lib/avatar";
 
@@ -64,9 +64,24 @@ const FlatPlane = ({ cfg }: { cfg: OverlayCfg }) => {
  */
 const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig }) => {
   const texture = useLoader(TextureLoader, cfg.url);
-  texture.wrapS = RepeatWrapping;
-  texture.wrapT = RepeatWrapping;
+  // Cylindrical projection: clamp vertical, wrap horizontal so the front of the
+  // product image sits on the chest and the sides curve naturally.
+  texture.wrapS = ClampToEdgeWrapping;
+  texture.wrapT = ClampToEdgeWrapping;
+  texture.anisotropy = 8;
+  texture.center.set(0.5, 0.5);
+  texture.repeat.set(1, 1);
+  texture.offset.set(0, 0);
   texture.needsUpdate = true;
+  const dressRef = useRef<Mesh>(null);
+
+  // Lightweight verlet sway for dresses — tilts the lower hem subtly.
+  useFrame((state) => {
+    if (!dressRef.current) return;
+    const t = state.clock.elapsedTime;
+    dressRef.current.rotation.z = Math.sin(t * 1.4) * 0.025;
+    dressRef.current.rotation.x = Math.cos(t * 1.1) * 0.015;
+  });
 
   const garment: GarmentKind = cfg.garment ?? "top";
   // base inflate is bigger to wrap the chunky stylized avatar without clipping
@@ -77,7 +92,7 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
       map={texture}
       transparent
       side={DoubleSide}
-      roughness={0.85}
+      roughness={0.78}
       metalness={0}
     />
   );
@@ -149,14 +164,14 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
   if (garment === "dress") {
     return (
       <group position={[cfg.x, -0.10 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
-        <mesh castShadow>
+        <mesh ref={dressRef} castShadow>
           <cylinderGeometry
             args={[
               0.42 * avatar.shoulders + inflate,
               0.60 * avatar.hips + inflate,
               1.75 * cfg.scale,
-              48,
-              8,
+              64,
+              16,
               true,
             ]}
           />
@@ -174,7 +189,7 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
     <group position={[cfg.x, 0.45 + cfg.y, 0]} rotation={[0, cfg.rotation, 0]}>
       <mesh castShadow>
         <cylinderGeometry
-          args={[radTop, radBot, 1.05 * cfg.scale, 48, 6, true]}
+          args={[radTop, radBot, 1.05 * cfg.scale, 64, 12, true]}
         />
         {Material}
       </mesh>
@@ -211,19 +226,32 @@ interface Props {
 
 export const TryOnScene = ({ avatar, overlay, bodyScale = 1, gender, glbUrl, controlsRef }: Props) => {
   return (
-    <Canvas shadows camera={{ position: [0, 1.4, 4], fov: 42 }} dpr={[1, 1.75]}>
-      <color attach="background" args={["#0e0c0a"]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[3, 6, 4]} intensity={1.1} castShadow />
-      <directionalLight position={[-3, 4, -2]} intensity={0.4} color="#d4a85a" />
+    <Canvas
+      shadows
+      camera={{ position: [0, 1.4, 3.6], fov: 38 }}
+      dpr={[1, 2]}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
+    >
+      {/* Hyper-Clean Showroom: pure white seamless cyc */}
+      <color attach="background" args={["#f6f6f4"]} />
+      <fog attach="fog" args={["#f6f6f4", 9, 20]} />
+      <ambientLight intensity={0.65} />
+      <directionalLight position={[4, 6, 4]} intensity={1.4} castShadow shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[-5, 3, 2]} intensity={0.55} />
+      <directionalLight position={[0, 4, -5]} intensity={0.7} />
       <Suspense fallback={null}>
         <Avatar3D cfg={avatar} bodyScale={bodyScale} gender={gender} glbUrl={glbUrl} />
         {overlay && overlay.mode === "flat" && <FlatPlane cfg={overlay} />}
         {overlay && (overlay.mode ?? "wrap") === "wrap" && (
           <WrappedGarment cfg={overlay} avatar={avatar} />
         )}
-        <ContactShadows position={[0, -1.21, 0]} opacity={0.55} scale={6} blur={2.5} />
-        <Environment preset="studio" />
+        {/* Seamless cyc floor */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
+          <planeGeometry args={[20, 20]} />
+          <meshStandardMaterial color="#f6f6f4" roughness={0.95} />
+        </mesh>
+        <ContactShadows position={[0, -1.199, 0]} opacity={0.5} scale={8} blur={2.8} far={4} />
+        <Environment preset="city" />
       </Suspense>
       <OrbitControls
         ref={controlsRef as any}
