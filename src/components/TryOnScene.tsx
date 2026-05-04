@@ -1,7 +1,7 @@
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
 import { Suspense, useMemo, useRef, MutableRefObject } from "react";
-import { TextureLoader, DoubleSide, RepeatWrapping, ClampToEdgeWrapping, Mesh } from "three";
+import { TextureLoader, DoubleSide, ClampToEdgeWrapping, Mesh } from "three";
 import { Avatar3D } from "./Avatar3D";
 import { AvatarConfig } from "@/lib/avatar";
 
