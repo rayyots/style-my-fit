@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import {
   Box3,
   BufferGeometry,
@@ -67,6 +67,9 @@ const OBJAvatar = ({
   // Premium skin material + size normalization. Per-region body shaping is
   // applied via group-level non-uniform scale below (NOT per-vertex, which
   // warps multi-mesh OBJs around their individual local origins).
+  // GUARD: a single clone is built per (url, skin) and reused — prevents the
+  // "two avatars" flicker from React StrictMode double-mount or rapid prop
+  // changes re-attaching <primitive> nodes to multiple parents.
   const { fitted, fitScale, yOffset } = useMemo(() => {
     const clone = obj.clone(true);
     const skinCol = new Color(skin);
@@ -100,6 +103,21 @@ const OBJAvatar = ({
     return { fitted: clone, fitScale: s, yOffset: yOff };
   }, [obj, skin]);
 
+  // Dispose the cloned geometries/materials when this clone is replaced or
+  // unmounted, so we never accumulate orphan meshes in the scene graph.
+  useEffect(() => {
+    return () => {
+      fitted.traverse((child) => {
+        const mesh = child as Mesh;
+        if (!(mesh as any).isMesh) return;
+        mesh.geometry?.dispose?.();
+        const m: any = mesh.material;
+        if (Array.isArray(m)) m.forEach((x) => x?.dispose?.());
+        else m?.dispose?.();
+      });
+    };
+  }, [fitted]);
+
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -114,13 +132,13 @@ const OBJAvatar = ({
     );
   });
 
+  // NOTE: scale is owned exclusively by the useFrame loop above. Setting
+  // scale via JSX prop here would fight the loop and momentarily render a
+  // mis-sized ghost on every prop change. The `key` on <primitive> ensures
+  // React never reuses an old object instance with a stale parent.
   return (
-    <group
-      ref={ref}
-      position={[0, yOffset, 0]}
-      scale={[bodyScale * fitScale, bodyScale * fitScale * cfg.torso, bodyScale * fitScale]}
-    >
-      <primitive object={fitted} />
+    <group ref={ref} position={[0, yOffset, 0]}>
+      <primitive key={fitted.uuid} object={fitted} />
     </group>
   );
 };

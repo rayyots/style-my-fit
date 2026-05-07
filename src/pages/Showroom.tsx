@@ -41,7 +41,7 @@ const Showroom = () => {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-[100dvh] w-screen flex flex-col bg-background overflow-hidden">
       <header className="border-b border-foreground/10 px-4 sm:px-6 lg:px-12 py-3 flex items-center justify-between bg-background/90 backdrop-blur z-10">
         <div className="flex items-center gap-2">
           <MobileNavTrigger />
