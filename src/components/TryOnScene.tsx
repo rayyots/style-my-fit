@@ -87,6 +87,11 @@ const WrappedGarment = ({ cfg, avatar }: { cfg: OverlayCfg; avatar: AvatarConfig
   // base inflate is bigger to wrap the chunky stylized avatar without clipping
   const inflate = 0.06 + Math.max(0, cfg.z) * 0.5;
 
+  // Mirror Avatar3D's group-level non-uniform scaling so garments track the
+  // avatar's true rendered size after slider changes.
+  const widthAvg = (avatar.shoulders + avatar.waist + avatar.hips) / 3;
+  const hScale = avatar.torso;
+
   const Material = (
     <meshStandardMaterial
       map={texture}
